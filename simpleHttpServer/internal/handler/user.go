@@ -40,26 +40,28 @@ func AddUserData(w http.ResponseWriter, r *http.Request) {
 	var user models.UserData
 	var users []models.UserData
 
+	//as this is a very basic http package, we need to handle a post request explictly
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
+	//decode the json body to bytes
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-
+	//open the file
 	fileData, err := os.ReadFile("internal/handler/users.json")
 	if err == nil {
+		//parse the data
 		err = json.Unmarshal(fileData, &users)
 		if err != nil {
 			http.Error(w, "Failed to parse users file", http.StatusInternalServerError)
 			return
 		}
 	}
-
+	//append the new data to the existing users data in users.json to avoid overwritting
 	users = append(users, user)
 
 	updatedData, err := json.MarshalIndent(users, "", "  ")
@@ -67,7 +69,7 @@ func AddUserData(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to encode users", http.StatusInternalServerError)
 		return
 	}
-
+	//write to the file
 	err = os.WriteFile("internal/handler/users.json", updatedData, 0644)
 	if err != nil {
 		http.Error(w, "Failed to save users", http.StatusInternalServerError)
