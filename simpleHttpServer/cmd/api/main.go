@@ -11,6 +11,7 @@ func main() {
 	//register routes
 	http.HandleFunc("/", healthRoute)
 	http.HandleFunc("/users", handler.GetUserData)
+	http.HandleFunc("/addUser", handler.AddUserData)
 
 	log.Println("Server running on :8080")
 
