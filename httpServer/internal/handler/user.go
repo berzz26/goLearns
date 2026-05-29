@@ -17,9 +17,16 @@ type UserData struct {
 
 func GetUserData(w http.ResponseWriter, r *http.Request) {
 	//intialise userData struct with dummy values
-	response := UserData{
-		Username: "Raju",
-		Age:      22,
+	response := []UserData{
+		{
+			Username: "Raju",
+			Age:      22,
+		},
+		{
+			Username: "rames",
+			Age: 22,
+
+		},
 	}
 	//set the headers to send a json response
 	w.Header().Set("Content-Type", "application/json")
