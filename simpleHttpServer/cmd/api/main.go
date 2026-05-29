@@ -23,6 +23,6 @@ func healthRoute(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("Method: ", r.Method)
 	fmt.Print("Path : ", r.URL.Path)
 
-	w.Write([]byte("HEY"))
+	w.Write([]byte("server is up"))
 
 }
