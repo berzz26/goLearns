@@ -6,8 +6,23 @@ import (
 	"log"
 )
 
-func GetUser(db *sql.DB) ([]model.User, error) {
-	rows, err := db.Query(`
+type UserRepository struct {
+	db *sql.DB
+}
+
+func NewUserRepository(
+	db *sql.DB,
+) *UserRepository {
+
+	return &UserRepository{
+		db: db,
+	}
+}
+
+// this is a struct method..can be called by UserRepository.GetUsers()
+func (r *UserRepository) GetUsers() ([]model.User, error) {
+	// query() used when expecting multiple results
+	rows, err := r.db.Query(`
 		SELECT id, name, email
 		FROM users
 	`)
@@ -37,14 +52,12 @@ func GetUser(db *sql.DB) ([]model.User, error) {
 	return users, nil
 }
 
-func GetOneUser(
-	db *sql.DB,
-	id int,
-) (*model.User, error) {
+func (r *UserRepository) GetOneUser(id int) (*model.User, error) {
 
 	var user model.User
 
-	err := db.QueryRow(`
+	// queryrow used to get 1 result
+	err := r.db.QueryRow(`
 		SELECT id, name, email
 		FROM users
 		WHERE id = $1
