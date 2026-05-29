@@ -1,8 +1,11 @@
 package handler
 
 import (
+	// "encoding/json"
 	"encoding/json"
+	// "log"
 	"net/http"
+	"os"
 )
 
 //create a simple userData struct with fields
@@ -16,25 +19,24 @@ type UserData struct {
 }
 
 func GetUserData(w http.ResponseWriter, r *http.Request) {
-	//intialise userData struct with dummy values
-	response := []UserData{
-		{
-			Username: "Raju",
-			Age:      22,
-		},
-		{
-			Username: "rames",
-			Age: 22,
 
-		},
+	data, err := os.ReadFile("internal/handler/users.json")
+	if err != nil {
+		panic(err)
 	}
+
+	var users []UserData
+
+	err = json.Unmarshal(data, &users)
+	if err != nil {
+		panic(err)
+	}
+	
+
 	//set the headers to send a json response
 	w.Header().Set("Content-Type", "application/json")
-
+	json.NewEncoder(w).Encode(users)
 	// "w" is the http response steram
 	// so anything written to "w" is sent to the client
-	// newEncoder( ) creates an obj that knows how to convert go values to JSON
-	encoder := json.NewEncoder(w)
-	// ENcode() looks aat the map (the struct) and converts it to json
-	encoder.Encode(response)
+
 }
