@@ -7,6 +7,7 @@ import (
 	"fmwkHttpServer/internal/services"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 type UserHandler struct {
@@ -77,9 +78,11 @@ func (h *UserHandler) AddUser(
 
 	user, err := h.service.AddUser(req)
 	if err != nil {
+		log.Error(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": "Unexpected Server Error",
 		})
+
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(user)
