@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	
 	"strconv"
 
+	model "fmwkHttpServer/internal/models"
 	"fmwkHttpServer/internal/services"
 
 	"github.com/gofiber/fiber/v2"
@@ -62,4 +62,25 @@ func (h *UserHandler) GetOneUser(
 	}
 
 	return c.JSON(user)
+}
+
+func (h *UserHandler) AddUser(
+	c *fiber.Ctx,
+) error {
+	var req model.User
+	// body parser basically acts as zod validation for the incoming payload and validates it against our user model
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid request body",
+		})
+	}
+
+	user, err := h.service.AddUser(req)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(user)
 }

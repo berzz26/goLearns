@@ -24,3 +24,7 @@ func (s *UserService) GetUsers() ([]model.User, error) {
 func (s *UserService) GetOneUser(id int) (*model.User, error) {
 	return s.repo.GetOneUser(id)
 }
+
+func (s *UserService) AddUser(user model.User) (*model.User, error) {
+	return s.repo.AddUser(user)
+}

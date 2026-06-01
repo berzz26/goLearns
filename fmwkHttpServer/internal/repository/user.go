@@ -39,8 +39,7 @@ func (r *UserRepository) GetUsers() ([]model.User, error) {
 
 		err := rows.Scan(
 			&user.ID,
-			&user.Name,
-			
+			&user.Username,
 		)
 
 		if err != nil {
@@ -63,13 +62,27 @@ func (r *UserRepository) GetOneUser(id int) (*model.User, error) {
 		WHERE id = $1
 	`, id).Scan(
 		&user.ID,
-		&user.Name,
-		
+		&user.Username,
 	)
 
 	if err != nil {
 		return nil, err
 	}
 
+	return &user, nil
+}
+
+func (r *UserRepository) AddUser(user model.User) (*model.User, error) {
+	err := r.db.QueryRow(
+		`INSERT INTO users(id, username)
+         VALUES($1, $2)
+         RETURNING id`,
+		user.ID,
+		user.Username,
+	).Scan(&user.ID)
+
+	if err != nil {
+		return nil, err
+	}
 	return &user, nil
 }

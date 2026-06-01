@@ -12,4 +12,6 @@ func SetupRoutes(
 	r.Get("/users", userHandler.GetUsers)
 
 	r.Get("/users/:id", userHandler.GetOneUser)
+
+	r.Post("/users", userHandler.AddUser)
 }
