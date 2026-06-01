@@ -1,9 +1,12 @@
 package handlers
 
 import (
-	"fmwkHttpServer/internal/models"
+	
+	"strconv"
 
 	"fmwkHttpServer/internal/services"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type UserHandler struct {
@@ -19,10 +22,44 @@ func NewUserHandler(
 		service: service,
 	}
 }
+func (h *UserHandler) GetUsers(
+	c *fiber.Ctx,
+) error {
 
-func (h *UserHandler) GetUsers() ([]model.User, error) {
-	return h.service.GetUsers()
+	users, err := h.service.GetUsers()
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(users)
 }
-func (h *UserHandler) GetOneUser(id int) (*model.User, error) {
-	return h.service.GetOneUser(id)
+
+func (h *UserHandler) GetOneUser(
+	c *fiber.Ctx,
+
+) error {
+	id, err := strconv.Atoi(
+		c.Params("id"),
+	)
+	if err != nil {
+		return c.Status(400).JSON(
+			fiber.Map{
+				"error": "invalid ID",
+			},
+		)
+	}
+	user, err := h.service.GetOneUser(id)
+
+	if err != nil {
+		return c.Status(404).JSON(
+			fiber.Map{
+				"error": err.Error(),
+			},
+		)
+	}
+
+	return c.JSON(user)
 }
