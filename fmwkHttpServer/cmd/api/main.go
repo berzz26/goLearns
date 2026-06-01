@@ -20,10 +20,14 @@ func main() {
 	userService := service.NewUserService(repo)
 
 	handler := handlers.NewUserHandler(userService)
-
+	//production grade router setup
+	// "/api/v1.."
 	app := fiber.New()
+	api := app.Group("/api")
+	// seperate v1 group so that versioning could be easily managed
+	v1 := api.Group("/v1")
 
-	routes.SetupRoutes(app, handler)
+	routes.SetupRoutes(v1, handler)
 
 	log.Println("server up at 8080")
 

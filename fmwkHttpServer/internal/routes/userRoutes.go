@@ -6,10 +6,10 @@ import (
 )
 
 func SetupRoutes(
-	app *fiber.App,
+	r fiber.Router,
 	userHandler *handlers.UserHandler,
 ) {
-	app.Get("/users", userHandler.GetUsers)
+	r.Get("/users", userHandler.GetUsers)
 
-	app.Get("/users/:id", userHandler.GetOneUser)
+	r.Get("/users/:id", userHandler.GetOneUser)
 }
