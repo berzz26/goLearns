@@ -1,28 +1,28 @@
 package handlers
 
 import (
-	"database/sql"
 	"fmwkHttpServer/internal/models"
-	"fmwkHttpServer/internal/repository"
+
 	"fmwkHttpServer/internal/services"
 )
 
-func GetUsers(db *sql.DB) ([]model.User, error) {
-
-	repo := repository.NewUserRepository(db)
-	service := service.NewUserService(repo)
-
-	users, err := service.GetUsers()
-
-	return users, err
-
+type UserHandler struct {
+	service *service.UserService
 }
-func GetOneUser(db *sql.DB, id int) (*model.User, error) {
-	repo := repository.NewUserRepository(db)
-	service := service.NewUserService(repo)
 
-	user, err := service.GetOneUser(id)
+func NewUserHandler(
 
-	return user, err
+	service *service.UserService,
 
+) *UserHandler {
+	return &UserHandler{
+		service: service,
+	}
+}
+
+func (h *UserHandler) GetUsers() ([]model.User, error) {
+	return h.service.GetUsers()
+}
+func (h *UserHandler) GetOneUser(id int) (*model.User, error) {
+	return h.service.GetOneUser(id)
 }

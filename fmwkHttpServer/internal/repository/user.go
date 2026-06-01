@@ -23,7 +23,7 @@ func NewUserRepository(
 func (r *UserRepository) GetUsers() ([]model.User, error) {
 	// query() used when expecting multiple results
 	rows, err := r.db.Query(`
-		SELECT id, name, email
+		SELECT id, username
 		FROM users
 	`)
 	if err != nil {
@@ -40,7 +40,7 @@ func (r *UserRepository) GetUsers() ([]model.User, error) {
 		err := rows.Scan(
 			&user.ID,
 			&user.Name,
-			&user.Email,
+			
 		)
 
 		if err != nil {
@@ -58,13 +58,13 @@ func (r *UserRepository) GetOneUser(id int) (*model.User, error) {
 
 	// queryrow used to get 1 result
 	err := r.db.QueryRow(`
-		SELECT id, name, email
+		SELECT id, username
 		FROM users
 		WHERE id = $1
 	`, id).Scan(
 		&user.ID,
 		&user.Name,
-		&user.Email,
+		
 	)
 
 	if err != nil {
