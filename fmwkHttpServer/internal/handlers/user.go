@@ -3,7 +3,7 @@ package handlers
 import (
 	"strconv"
 
-	model "fmwkHttpServer/internal/models"
+	"fmwkHttpServer/internal/models"
 	"fmwkHttpServer/internal/services"
 
 	"github.com/gofiber/fiber/v2"
