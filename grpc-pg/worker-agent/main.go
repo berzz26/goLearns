@@ -3,40 +3,50 @@ package main
 import (
 	"context"
 	"fmt"
-	"net"
+	"time"
 
 	pb "grpc-pg/gen/worker"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
-type server struct {
-	pb.UnimplementedWorkerServiceServer
-}
-
-// this is the service that we are implementing that already has been defined in the gen/worker folder
-func (s *server) SendHeartbeat(ctx context.Context, hb *pb.Heartbeat) (*pb.Ack, error) {
-	fmt.Println(hb.WorkerId)
-	return &pb.Ack{
-		Message: "recieved",
-	}, nil
-}
-
-func main() {
-	//open a port at 50051 that accepts tcp connections(50051 just a convention)
-	lis, err := net.Listen("tcp", ":50051")
+func main() { //connect to the server
+	conn, err := grpc.NewClient(
+		"localhost:50051",
+		grpc.WithTransportCredentials(
+			insecure.NewCredentials(),
+		),
+	)
+	defer conn.Close()
 	if err != nil {
 		panic(err)
 	}
-	//create a grpc server
-	grpcServer := grpc.NewServer()
+	// connect the client
+	client := pb.NewWorkerServiceClient(conn)
 
-	//register a service
-	pb.RegisterWorkerServiceServer(
-		grpcServer,
-		&server{},
-	)
-	//When somebody calls SendHeartbeat, execute methods on this server struct.
-	//start server
-	grpcServer.Serve(lis)
+	// build a req
+	id := 1
+	workerId := fmt.Sprintf("worker %d", id)
+	hb := &pb.Heartbeat{
+		WorkerId: workerId,
+		CpuUsage: 42.5,
+		RamUsage: 61.3,
+		GpuUsage: 78.1,
+	}
+
+	// call the rpc
+	for {
+		resp, err := client.SendHeartbeat(
+			context.Background(),
+			hb,
+		)
+		id+=1
+		time.Sleep(5 * time.Second)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(resp.Message)
+		fmt.Println(hb)
+	}
 }
