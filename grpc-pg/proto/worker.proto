@@ -1,3 +1,14 @@
 syntax = "proto3";
 
-package worker
+package worker;
+
+option go_package="./gen/worker";
+
+message Heartbeat {
+  string worker_id = 1;
+
+  double cpu_usage = 2;
+  double ram_usage = 3;
+  double gpu_usage = 4;
+}
+
