@@ -28,15 +28,15 @@ func main() { //connect to the server
 
 	// build a req
 	id := 1
-	workerId := fmt.Sprintf("worker-%d", rand.Int32N(10))
-
+	
 	// call the rpc
 	for {
+		workerId := fmt.Sprintf("worker-%d", rand.Int32N(10))
 		hb := &pb.Heartbeat{
 			WorkerId: workerId,
-			CpuUsage: rand.Float64() * 10,
-			RamUsage: rand.ExpFloat64() * 10,
-			GpuUsage: 78.1,
+			CpuUsage: rand.Float64() * 100,
+			RamUsage: rand.ExpFloat64() * 100,
+			GpuUsage: rand.ExpFloat64()*10,
 		}
 		resp, err := client.SendHeartbeat(
 			context.Background(),
