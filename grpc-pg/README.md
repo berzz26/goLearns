@@ -1,7 +1,7 @@
 <h1>gRPC playground</h1>
 Okay so this project is a playground for me to understand what exactly  is.
 
-We will mimic a service of [computebay](https://computebay.online) to learn this protocol.
+We will mimic a service of [computebay](https:computebay.online) to learn this protocol.
 
 Imagine this
 
@@ -266,3 +266,27 @@ every few seconds.
 The control plane receives it.
 
 This is basically the first building block of ComputeBay.
+
+- in this, when we connect to the server, the client maintains a tcp connection and reuses that everytime a req has to be sent
+- so basically, at each iteration we are reusing the existing conneciton and utilizing rpc.
+- **so gPRC uses http2 by default instead of http1.1**
+
+- The thing that makes this faster is protobuf, sending binary payloads instead of json
+
+- native steraming:
+    - REST usually does this: send req, get response for every iteration/call
+
+- but with grpc streaming, there is a one long lived connection stream from the client to the server, hence no repeated req lifecycle
+
+
+This was a unary rpc flow
+    
+    .proto
+    ↓
+    Generate code
+    ↓
+    Server implements interface
+    ↓
+    Client calls RPC
+    ↓
+    Network request happens

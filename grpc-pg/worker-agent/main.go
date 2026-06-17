@@ -1,5 +1,5 @@
 package main
-
+// Worker Agent (Client)
 import (
 	"context"
 	"fmt"
@@ -12,7 +12,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func main() { //connect to the server
+func main() { 
+	//connect to the server
 	conn, err := grpc.NewClient(
 		"localhost:50051",
 		grpc.WithTransportCredentials(
@@ -23,13 +24,12 @@ func main() { //connect to the server
 	if err != nil {
 		panic(err)
 	}
-	// connect the client
+	// connect the client(imp)
 	client := pb.NewWorkerServiceClient(conn)
 
-	// build a req
+	// build payload and call rpc loop
 	id := 1
 	
-	// call the rpc
 	for {
 		workerId := fmt.Sprintf("worker-%d", rand.Int32N(10))
 		hb := &pb.Heartbeat{
@@ -38,6 +38,7 @@ func main() { //connect to the server
 			RamUsage: rand.ExpFloat64() * 100,
 			GpuUsage: rand.ExpFloat64()*10,
 		}
+		// call the rpc
 		resp, err := client.SendHeartbeat(
 			context.Background(),
 			hb,
