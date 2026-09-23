@@ -44,7 +44,7 @@ func FwdUser(w http.ResponseWriter, r *http.Request) {
 				newReq.Header.Add(key,value)
 			}
 		}
-
+		
 		resp,err := http.DefaultClient.Do(newReq)
 		
 		if err != nil {

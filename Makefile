@@ -27,6 +27,11 @@ list: ## List all discovered main.go files
 	@find . -name "main.go" -type f | sort
 
 # ── Individual runners ──────────────────────────────────────────────
+run-loadTest: ## Run reverseProxy/cmd/api
+	@echo "==> loadTest"
+	@cd loadTest && go run ./main.go
+
+
 run-proxy: ## Run reverseProxy/cmd/api
 	@echo "==> reverseProxy/cmd/api"
 	@cd reverseProxy && go run ./cmd/api

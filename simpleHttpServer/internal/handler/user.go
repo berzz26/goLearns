@@ -4,6 +4,7 @@ import (
 	// "encoding/json"
 	"encoding/json"
 	"log"
+	"time"
 	"httpServer/internal/models"
 	"net/http"
 	"os"
@@ -92,4 +93,15 @@ func AddUserData(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 
 	json.NewEncoder(w).Encode(user)
+}
+
+func SlowReqDemo(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.Method)
+	log.Println(r.URL)
+	log.Println(r.Header)
+
+	//simulate a slow request by sleeping for 10 seconds
+	time.Sleep(5 * time.Second)
+
+	w.Write([]byte("slow request demo"))
 }
