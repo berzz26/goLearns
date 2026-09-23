@@ -31,10 +31,18 @@ func FwdUser(w http.ResponseWriter, r *http.Request) {
 		// fwd get request
 		log.Println("fwding request to the server")
 		
+		
 		newReq,err := http.NewRequest(r.Method, path, nil)
 		if err != nil {
 			http.Error(w, "Failed to create request", http.StatusInternalServerError)
 			return
+		}
+
+		//fwd req headers 
+		for key,values := range r.Header {
+			for _,value := range values {
+				newReq.Header.Add(key,value)
+			}
 		}
 
 		resp,err := http.DefaultClient.Do(newReq)
@@ -45,7 +53,17 @@ func FwdUser(w http.ResponseWriter, r *http.Request) {
 		}
 		
 		defer resp.Body.Close()
+		
+		//fwd resp headers
+		for key,values := range resp.Header{
+			for _,value := range values {
+				w.Header().Add(key,value)
+			}
+		}
+		//fwd res status
+		w.WriteHeader(resp.StatusCode)
 
+		//stream resp body to client
 		io.Copy(w,resp.Body)
 
 	}
@@ -59,6 +77,12 @@ func FwdUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		for key,values := range r.Header {
+			for _,value := range values {
+				newReq.Header.Add(key,value)
+			}
+		}
+
 		resp,err := http.DefaultClient.Do(newReq)
 		
 		if err != nil {
@@ -66,6 +90,14 @@ func FwdUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer resp.Body.Close()
+
+		for key,values := range resp.Header{
+			for _,value := range values {
+				w.Header().Add(key,value)
+			}
+		}
+
+		w.WriteHeader(resp.StatusCode)
 
 		io.Copy(w, resp.Body)
 

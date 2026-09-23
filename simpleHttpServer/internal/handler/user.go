@@ -3,7 +3,7 @@ package handler
 import (
 	// "encoding/json"
 	"encoding/json"
-	// "log"
+	"log"
 	"httpServer/internal/models"
 	"net/http"
 	"os"
@@ -21,6 +21,10 @@ func GetUserData(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	log.Println(r.Method)
+	log.Println(r.URL)
+	log.Println(r.Header)
+
 
 	var users []models.UserData
 
@@ -45,12 +49,20 @@ func AddUserData(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
+	log.Println(r.Method)
+	log.Println(r.URL)
+	log.Println(r.Header)
+	log.Println("Raw body: ", r.Body)
+	log.Printf("Raw body type: %T", r.Body)
 	//decode the json body to bytes
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
+
+	log.Println("Decoded user data: ", user)
 	//open the file
 	fileData, err := os.ReadFile("internal/handler/users.json")
 	if err == nil {
