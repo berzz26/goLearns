@@ -1,15 +1,29 @@
 package main
+
 import (
 	"fmt"
-	"reverseProxy/internal/handler"
 	"log"
 	"net/http"
+	"reverseProxy/internal/handler"
 )
 
-func main(){
+func main() {
+	client := &http.Client{
+		// Timeout: 5 * time.Second,
+
+		// defines the maximum number of connections per host.
+		// if the limit is reached, the client will wait for a connection
+		// to be available before making a new request
+		Transport: &http.Transport{
+			MaxConnsPerHost: 2,
+		},
+	}
+
+	proxy := handler.NewProxy(client)
 
 	http.HandleFunc("/", healthRoute)
-	http.HandleFunc("/users", handler.FwdUser)
+	http.HandleFunc("/users", proxy.FwdUser)
+	http.HandleFunc("/slow", proxy.SlowReqDemo)
 
 	log.Println("proxy running on :8081")
 
@@ -24,6 +38,3 @@ func healthRoute(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("proxy is up"))
 
 }
-
-
-

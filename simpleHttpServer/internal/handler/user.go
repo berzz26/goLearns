@@ -101,7 +101,7 @@ func SlowReqDemo(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.Header)
 
 	//simulate a slow request by sleeping for 10 seconds
-	time.Sleep(5 * time.Second)
+	time.Sleep(30 * time.Second)
 
 	w.Write([]byte("slow request demo"))
 }
