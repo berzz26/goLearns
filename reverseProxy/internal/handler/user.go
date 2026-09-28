@@ -50,6 +50,7 @@ func (p *Proxy) FwdUser(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := p.client.Do(newReq)
 	if err != nil {
+		log.Println("failed to forward request:", err)
 		http.Error(w, "Failed to forward request", http.StatusInternalServerError)
 		return
 	}
@@ -99,6 +100,7 @@ func (p *Proxy) SlowReqDemo(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := p.client.Do(newReq)
 	if err != nil {
+		log.Println("forwarding error: ", err)
 		http.Error(w, "Failed to forward request", http.StatusInternalServerError)
 		return
 	}
@@ -119,4 +121,3 @@ func (p *Proxy) SlowReqDemo(w http.ResponseWriter, r *http.Request) {
 		log.Println("failed to stream response:", err)
 	}
 }
-

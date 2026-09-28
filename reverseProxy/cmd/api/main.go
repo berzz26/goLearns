@@ -5,11 +5,12 @@ import (
 	"log"
 	"net/http"
 	"reverseProxy/internal/handler"
+	"time"
 )
 
 func main() {
 	client := &http.Client{
-		// Timeout: 5 * time.Second,
+		Timeout: 5 * time.Second,
 
 		// defines the maximum number of connections per host.
 		// if the limit is reached, the client will wait for a connection
