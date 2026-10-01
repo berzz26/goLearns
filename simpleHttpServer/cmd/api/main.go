@@ -12,7 +12,8 @@ import (
 func main() {
 	portRange := 3
 	startPort := 8080
-
+	//run multiple instances of the server on 
+	// different ports concurrently using goroutines
 	for i := 0; i < portRange; i++ {
 		go runServer(startPort + i)
 	}
@@ -23,11 +24,12 @@ func main() {
 func runServer(port int) {
 	mux := http.NewServeMux()
 
-	// Register routes
+	// register routes
 	mux.HandleFunc("/", healthRoute(port))
 	mux.HandleFunc("/users", handler.GetUserData)
 	mux.HandleFunc("/addUser", handler.AddUserData)
 	mux.HandleFunc("/slow", handler.SlowReqDemo)
+
 
 	server := &http.Server{
 		Addr:        fmt.Sprintf(":%d", port),

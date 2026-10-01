@@ -20,6 +20,8 @@ func NewProxy(client *http.Client) *Proxy {
 var reqCount int64
 
 func (p *Proxy) FwdUser(w http.ResponseWriter, r *http.Request) {
+	// rr balancing -select the server based on the 
+	// request count
 
 	servers := []string{
 		"http://localhost:8080",
@@ -38,7 +40,8 @@ func (p *Proxy) FwdUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var path string
-
+	//atmoic increment of reqCount to ensure thread safety 
+	// during concurrent requests. 
 	server := atomic.LoadInt64(&reqCount) % 3
 
 	switch r.Method {
