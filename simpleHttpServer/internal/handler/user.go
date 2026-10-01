@@ -10,8 +10,8 @@ import (
 	"os"
 )
 
-//create a simple userData struct with fields
-//`json:"username"` is a "struct tag" basically metadata attached to that field so basically, the json package knows that this should
+//  create a simple userData struct with fields
+// `json:"username"` is a "struct tag" basically metadata attached to that field so basically, the json package knows that this should
 // be encoded to "username " and not "Username"
 
 // struct tags can also define more metadata like required fields, nullable fields, default values etc

@@ -31,6 +31,10 @@ run-loadTest: ## Run reverseProxy/cmd/api
 	@echo "==> loadTest"
 	@cd loadTest && go run ./main.go
 
+run-lb: ## Run reverseProxy/cmd/api
+	@echo "==> loadBalancerHTTP/cmd/api"
+	@cd loadBalancerHTTP && go run ./cmd/api
+
 
 run-proxy: ## Run reverseProxy/cmd/api
 	@echo "==> reverseProxy/cmd/api"

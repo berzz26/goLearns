@@ -2,41 +2,56 @@ package main
 
 import (
 	"fmt"
-	"httpServer/internal/handler"
 	"log"
 	"net"
 	"net/http"
 	"time"
+	"httpServer/internal/handler"
 )
 
 func main() {
-	//register routes
+	portRange := 3
+	startPort := 8080
 
-	http.HandleFunc("/", healthRoute)
-	http.HandleFunc("/users", handler.GetUserData)
-	http.HandleFunc("/addUser", handler.AddUserData)
-	http.HandleFunc("/slow", handler.SlowReqDemo)
+	for i := 0; i < portRange; i++ {
+		go runServer(startPort + i)
+	}
 
-	log.Println("Server running on :8080")
+	select {}
+}
 
-	// ConnState specifies an optional callback function that is
-	// called when a client connection changes state
+func runServer(port int) {
+	mux := http.NewServeMux()
+
+	// Register routes
+	mux.HandleFunc("/", healthRoute(port))
+	mux.HandleFunc("/users", handler.GetUserData)
+	mux.HandleFunc("/addUser", handler.AddUserData)
+	mux.HandleFunc("/slow", handler.SlowReqDemo)
+
 	server := &http.Server{
-		Addr: ":8080",
+		Addr:        fmt.Sprintf(":%d", port),
+		Handler:     mux,
 		IdleTimeout: 10 * time.Second,
 
 		ConnState: func(conn net.Conn, state http.ConnState) {
 			log.Println(conn.RemoteAddr(), state)
 		},
 	}
-	server.ListenAndServe()
+
+	log.Printf("Server running on :%d\n", port)
+
+	err := server.ListenAndServe()
+	if err != nil {
+		log.Printf("Server on :%d stopped: %v\n", port, err)
+	}
 }
 
-func healthRoute(w http.ResponseWriter, r *http.Request) {
+func healthRoute(port int) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Method:", r.Method)
+		fmt.Println("Path:", r.URL.Path)
 
-	fmt.Print("Method: ", r.Method)
-	fmt.Print("Path : ", r.URL.Path)
-
-	w.Write([]byte("server is up"))
-
+		fmt.Fprintf(w, "server is up on port %d\n", port)
+	}
 }
