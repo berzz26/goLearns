@@ -11,6 +11,11 @@ type Proxy struct {
 	client *http.Client
 }
 
+type Server struct {
+	Address string
+	Weight  int
+}
+
 func NewProxy(client *http.Client) *Proxy {
 	return &Proxy{
 		client: client,
@@ -20,15 +25,14 @@ func NewProxy(client *http.Client) *Proxy {
 var reqCount int64
 
 func (p *Proxy) FwdUser(w http.ResponseWriter, r *http.Request) {
-	// rr balancing -select the server based on the 
+	// rr balancing -select the server based on the
 	// request count
 
-	servers := []string{
-		"http://localhost:8080",
-		"http://localhost:8081",
-		"http://localhost:8082",
+	servers := []Server{
+		{Address: "http://localhost:8080", Weight: 1},
+		{Address: "http://localhost:8081", Weight: 2},
+		{Address: "http://localhost:8082", Weight: 2},
 	}
-
 
 	log.Println(r.Method)
 	log.Println(r.URL)
@@ -40,18 +44,23 @@ func (p *Proxy) FwdUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var path string
-	//atmoic increment of reqCount to ensure thread safety 
-	// during concurrent requests. 
-	server := atomic.LoadInt64(&reqCount) % 3
+	//atmoic increment of reqCount to ensure thread safety
+	// during concurrent requests.
+
+	//weigheted RR
+	serverIndex := getWeightedServer(servers)
+
+	//simple RR
+	// serverIndex := getNextServer(servers)
 
 	switch r.Method {
 	case http.MethodGet:
-		path = servers[server] + "/users"
+		path = servers[serverIndex].Address + "/users"
 	case http.MethodPost:
-		path = servers[server] + "/addUser"
+		path = servers[serverIndex].Address + "/addUser"
 	}
-	
-	log.Println("selected server: ", servers[server])
+
+	log.Println("selected server: ", servers[serverIndex])
 
 	newReq, err := http.NewRequest(r.Method, path, r.Body)
 	if err != nil {
@@ -140,4 +149,29 @@ func (p *Proxy) SlowReqDemo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("failed to stream response:", err)
 	}
+}
+
+func getWeightedServer(servers []Server) int {
+	totalWeight := 0
+
+	for _, server := range servers {
+		totalWeight += server.Weight
+	}
+
+	count := atomic.AddInt64(&reqCount, 1) - 1
+	slot := int(count % int64(totalWeight))
+
+	for i, server := range servers {
+		if slot < server.Weight {
+			return i
+		}
+
+		slot -= server.Weight
+	}
+
+	return 0
+}
+func getNextServer(servers []Server) int {
+	count := atomic.AddInt64(&reqCount, 1) - 1
+	return int(count % int64(len(servers)))
 }
